@@ -1,0 +1,66 @@
+name: Deploy Chat App (Full CI/CD)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Backend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-backend:latest apps/backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-backend:latest
+
+      - name: Build & Push Frontend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-frontend:latest apps/frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-frontend:latest
+
+      - name: Deploy to EC2 (NO MANUAL STEPS)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            # 1. Preparar carpeta
+            mkdir -p ~/chat-app
+            cd ~/chat-app
+
+            # 2. Clonar o actualizar repo
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }} .
+            else
+              git pull origin main
+            fi
+
+            cd infra
+
+            # 3. Generar .env automáticamente
+            cat <<EOF > .env
+            PORT=${{ secrets.PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            PG_SSL=${{ secrets.PG_SSL }}
+            MONGO_URL=${{ secrets.MONGO_URL }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            S3_BUCKET=${{ secrets.S3_BUCKET }}
+            CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+            EOF
+
+            # 4. Deploy containers
+            docker compose pull
+            docker compose up -d
