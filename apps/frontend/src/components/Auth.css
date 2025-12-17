@@ -228,13 +228,22 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .auth-container {
+    padding: 16px;
+  }
+  
   .auth-box {
     padding: 32px 24px;
+    max-width: 100%;
   }
   
   .auth-title {
     font-size: 2rem;
+  }
+  
+  .form-group input {
+    font-size: 16px; /* Previene zoom en iOS */
   }
 }
 

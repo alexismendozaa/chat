@@ -12,6 +12,7 @@ export default function Chat({ token, username, onLogout }) {
   const [inputText, setInputText] = useState('');
   const [connected, setConnected] = useState(false);
   const [file, setFile] = useState(null);
+  const [showRoomSelector, setShowRoomSelector] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -125,12 +126,16 @@ export default function Chat({ token, username, onLogout }) {
   const changeRoom = (newRoom) => {
     setRoomId(newRoom);
     setMessages([]);
+    setShowRoomSelector(false);
   };
 
   return (
     <div className="chat-container">
       <div className="chat-header">
         <div className="header-left">
+          <button className="mobile-menu-btn" onClick={() => setShowRoomSelector(!showRoomSelector)}>
+            ☰
+          </button>
           <h2>#{roomId}</h2>
           <span className={`status ${connected ? 'connected' : 'disconnected'}`}>
             {connected ? 'Conectado' : 'Desconectado'}
@@ -156,6 +161,24 @@ export default function Chat({ token, username, onLogout }) {
           ))}
         </div>
       </div>
+
+      {/* Selector móvil de salas */}
+      {showRoomSelector && (
+        <div className="mobile-room-selector" onClick={() => setShowRoomSelector(false)}>
+          <div className="mobile-room-list" onClick={(e) => e.stopPropagation()}>
+            <h3>Selecciona una sala</h3>
+            {['general', 'memes'].map((room) => (
+              <button
+                key={room}
+                className={`mobile-room-btn ${roomId === room ? 'active' : ''}`}
+                onClick={() => changeRoom(room)}
+              >
+                #{room}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="chat-main">
         <div className="messages-container">
