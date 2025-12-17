@@ -62,7 +62,7 @@ export default function Chat({ token, username, onLogout }) {
     socket.emit('joinRoom', { roomId });
 
     socket.on('joined', ({ roomId: joinedRoom }) => {
-      console.log('✅ Joined room:', joinedRoom);
+      console.log('Joined room:', joinedRoom);
     });
 
     // Cargar mensajes previos
