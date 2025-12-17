@@ -27,6 +27,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    environment:
+      - BACKEND_URL=http://backend:3000
 
 volumes:
   mongo_data:

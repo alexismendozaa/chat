@@ -4,6 +4,8 @@ import { io } from "socket.io-client";
 import { uploadImage } from "./lib/upload.js";
 import { login, register } from "./auth.js";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 function Auth({ onAuth }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -78,7 +80,7 @@ function Chat({ token, onLogout }) {
   const [file, setFile] = useState(null);
 
   const socket = useMemo(
-    () => io("/", { transports: ["websocket"], auth: { token } }),
+    () => io(BACKEND_URL, { transports: ["websocket"], auth: { token } }),
     [token]
   );
 
@@ -94,7 +96,7 @@ function Chat({ token, onLogout }) {
     const loadHistory = async () => {
       if (!token) return;
       try {
-        const r = await fetch(`/api/chat/rooms/${roomId}/messages`, {
+        const r = await fetch(`${BACKEND_URL}/api/chat/rooms/${roomId}/messages`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await r.json();

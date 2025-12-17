@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL || "";
+
 export async function uploadImage(file, token) {
-  const r = await fetch("/api/uploads/image", {
+  const r = await fetch(`${API_URL}/api/uploads/image`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
