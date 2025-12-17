@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import Auth from './components/Auth';
+import Chat from './components/Chat';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [token, setToken] = useState(null);
+  const [username, setUsername] = useState(null);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  useEffect(() => {
+    const savedToken = localStorage.getItem('token');
+    const savedUsername = localStorage.getItem('username');
+    if (savedToken && savedUsername) {
+      setToken(savedToken);
+      setUsername(savedUsername);
+    }
+  }, []);
+
+  const handleLogin = (newToken, newUsername) => {
+    setToken(newToken);
+    setUsername(newUsername);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('username', newUsername);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUsername(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+  };
+
+  if (!token) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
+  return <Chat token={token} username={username} onLogout={handleLogout} />;
 }
 
-export default App
+export default App;
