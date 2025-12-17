@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import { uploadImage } from "./lib/upload.js";
 import { login, register } from "./auth.js";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 function Auth({ onAuth }) {
   const [username, setUsername] = useState("");

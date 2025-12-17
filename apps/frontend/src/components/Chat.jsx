@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import './Chat.css';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Chat({ token, username, onLogout }) {
   const [socket, setSocket] = useState(null);
