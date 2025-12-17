@@ -1,3 +1,4 @@
+/* Modern chat interface with glassmorphism */
 .chat-container {
   display: grid;
   grid-template-columns: 240px 1fr;

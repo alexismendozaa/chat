@@ -34,8 +34,8 @@ export default function Auth({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1 className="auth-title">ChatFlow</h1>
-        <p className="auth-subtitle">Conecta y conversa en tiempo real</p>
+        <h1 className="auth-title">Chat UCE</h1>
+        <p className="auth-subtitle">Programación para Dispositivos Móviles</p>
         <div className="auth-tabs">
           <button
             className={`auth-tab ${isLogin ? 'active' : ''}`}
