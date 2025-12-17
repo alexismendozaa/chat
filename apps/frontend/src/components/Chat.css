@@ -1,12 +1,16 @@
 /* Modern chat interface with glassmorphism */
+:root {
+  --header-height: 70px;
+  --header-height-mobile: 56px;
+}
 .chat-container {
   display: grid;
   grid-template-columns: 240px 1fr;
-  grid-template-rows: 70px 1fr;
+  grid-template-rows: var(--header-height) 1fr;
   grid-template-areas:
     "header header"
     "sidebar main";
-  height: 100vh;
+  height: 100dvh;
   background: 
     radial-gradient(circle at 10% 20%, rgba(120, 119, 198, 0.15), transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.15), transparent 40%),
@@ -20,6 +24,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 28px;
+  padding-top: env(safe-area-inset-top);
+  min-height: var(--header-height);
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -235,7 +241,7 @@
   grid-area: main;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 70px);
+  height: calc(100dvh - var(--header-height));
   backdrop-filter: blur(5px);
 }
 
@@ -284,9 +290,6 @@
   width: 0;
   height: 0;
   border-style: solid;
-}
-
-.message::before {
   top: 10px;
   left: -8px;
   border-width: 8px 8px 8px 0;
@@ -525,22 +528,7 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Botón de menú móvil */
-.mobile-menu-btn {
-  display: none;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.3s;
-}
-
-.mobile-menu-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
+/* removed duplicate base .mobile-menu-btn (definitions exist above and in media query) */
 
 /* Selector móvil de salas */
 .mobile-room-selector {
@@ -563,7 +551,7 @@
 
 .mobile-room-list {
   position: absolute;
-  top: 70px;
+  top: calc(var(--header-height-mobile) + env(safe-area-inset-top));
   left: 16px;
   right: 16px;
   background: rgba(0, 0, 0, 0.9);
@@ -572,7 +560,7 @@
   border-radius: 16px;
   padding: 20px;
   animation: slideDown 0.3s;
-  max-height: calc(100vh - 100px);
+  max-height: calc(100dvh - (var(--header-height-mobile) + 60px));
   overflow-y: auto;
 }
 
@@ -643,7 +631,7 @@
 @media (max-width: 768px) {
   .chat-container {
     grid-template-columns: 1fr;
-    grid-template-rows: 56px 1fr;
+    grid-template-rows: var(--header-height-mobile) 1fr;
     grid-template-areas:
       "header"
       "main";
@@ -671,8 +659,9 @@
   /* Ajustar header para móvil */
   .chat-header {
     padding: 0 8px;
-    height: 56px;
-    grid-template-rows: 56px;
+    height: var(--header-height-mobile);
+    grid-template-rows: var(--header-height-mobile);
+    padding-top: env(safe-area-inset-top);
   }
   
   .header-left {
@@ -711,7 +700,7 @@
   }
   
   .chat-main {
-    height: calc(100vh - 56px);
+    height: calc(100dvh - var(--header-height-mobile));
   }
   
   .messages-container {
