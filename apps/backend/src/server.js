@@ -20,7 +20,7 @@ app.use(helmet());
 app.use(express.json({ limit: "2mb" }));
 app.use(morgan("dev"));
 
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/uploads", uploadRoutes);
 
