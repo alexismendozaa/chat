@@ -50,6 +50,13 @@ export default function Chat({ token, username, onLogout }) {
 
     newSocket.on('message', (msg) => {
       setMessages((prev) => [...prev, msg]);
+      // Auto-add sender to DM list without reload (excluding self)
+      if (msg.user && msg.user !== username) {
+        setActiveUsers((prev) => {
+          if (prev.includes(msg.user)) return prev;
+          return [...prev, msg.user];
+        });
+      }
     });
 
     setSocket(newSocket);

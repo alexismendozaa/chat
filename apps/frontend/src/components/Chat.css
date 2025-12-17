@@ -11,6 +11,7 @@
     "header header"
     "sidebar main";
   height: 100dvh;
+  min-height: 100svh;
   background: 
     radial-gradient(circle at 10% 20%, rgba(120, 119, 198, 0.15), transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.15), transparent 40%),
@@ -242,6 +243,7 @@
   display: flex;
   flex-direction: column;
   height: calc(100dvh - var(--header-height));
+  min-height: calc(100svh - var(--header-height));
   backdrop-filter: blur(5px);
 }
 
@@ -252,6 +254,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overscroll-behavior: contain;
 }
 
 .no-messages {
@@ -359,6 +362,7 @@
   display: flex;
   gap: 12px;
   padding: 24px 28px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -561,6 +565,8 @@
   padding: 20px;
   animation: slideDown 0.3s;
   max-height: calc(100dvh - (var(--header-height-mobile) + 60px));
+  /* Android fallback */
+  min-height: calc(100svh - (var(--header-height-mobile) + 60px));
   overflow-y: auto;
 }
 
@@ -701,6 +707,7 @@
   
   .chat-main {
     height: calc(100dvh - var(--header-height-mobile));
+    min-height: calc(100svh - var(--header-height-mobile));
   }
   
   .messages-container {
@@ -719,6 +726,7 @@
   
   .message-form {
     padding: 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
     gap: 6px;
     flex-wrap: nowrap;
   }
