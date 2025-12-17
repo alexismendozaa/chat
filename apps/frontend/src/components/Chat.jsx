@@ -117,19 +117,19 @@ export default function Chat({ token, username, onLogout }) {
     <div className="chat-container">
       <div className="chat-header">
         <div className="header-left">
-          <h2>Chat Room: {roomId}</h2>
+          <h2>#{roomId}</h2>
           <span className={`status ${connected ? 'connected' : 'disconnected'}`}>
-            {connected ? '🟢 Connected' : '🔴 Disconnected'}
+            {connected ? 'Conectado' : 'Desconectado'}
           </span>
         </div>
         <div className="header-right">
-          <span className="username">👤 {username}</span>
-          <button onClick={onLogout} className="logout-btn">Logout</button>
+          <span className="username">{username}</span>
+          <button onClick={onLogout} className="logout-btn">Salir</button>
         </div>
       </div>
 
       <div className="chat-sidebar">
-        <h3>Rooms</h3>
+        <h3>Salas</h3>
         <div className="room-list">
           {['general', 'random', 'tech', 'gaming'].map((room) => (
             <button
@@ -146,7 +146,7 @@ export default function Chat({ token, username, onLogout }) {
       <div className="chat-main">
         <div className="messages-container">
           {messages.length === 0 ? (
-            <div className="no-messages">No messages yet. Start the conversation!</div>
+            <div className="no-messages">✨ Ningún mensaje aún. ¡Inicia la conversación!</div>
           ) : (
             messages.map((msg) => (
               <div
@@ -174,12 +174,12 @@ export default function Chat({ token, username, onLogout }) {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="Escribe un mensaje..."
             className="message-input"
             disabled={!connected}
           />
           <button type="submit" className="send-btn" disabled={!connected || !inputText.trim()}>
-            Send
+            Enviar
           </button>
         </form>
       </div>
