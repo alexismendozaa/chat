@@ -12,6 +12,9 @@
     "sidebar main";
   height: 100dvh;
   min-height: 100svh;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
   background: 
     radial-gradient(circle at 10% 20%, rgba(120, 119, 198, 0.15), transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.15), transparent 40%),
@@ -244,6 +247,7 @@
   flex-direction: column;
   height: calc(100dvh - var(--header-height));
   min-height: calc(100svh - var(--header-height));
+  width: 100%;
   backdrop-filter: blur(5px);
 }
 
@@ -727,32 +731,40 @@
   .message-form {
     padding: 10px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    gap: 6px;
-    flex-wrap: nowrap;
+    gap: 8px 10px;
+    flex-wrap: wrap;
+    align-items: stretch;
   }
   
   .message-input {
-    flex: 1;
+    flex: 1 1 100%;
     min-width: 0;
     font-size: 16px;
     padding: 10px 12px;
+    order: 1;
   }
   
   .send-btn {
     padding: 10px 14px;
     font-size: 0.85rem;
     white-space: nowrap;
+    order: 3;
+    flex: 0 0 auto;
   }
   
   .file-label {
     padding: 10px 12px;
     font-size: 1rem;
+    order: 2;
+    flex: 0 0 48px;
   }
   
   .send-image-btn {
     padding: 10px 12px;
-    font-size: 0.75rem;
-    max-width: 90px;
+    font-size: 0.8rem;
+    max-width: none;
+    width: 100%;
+    order: 4;
   }
 }
 
