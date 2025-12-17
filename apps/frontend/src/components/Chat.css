@@ -637,9 +637,13 @@
   }
   
   .mobile-menu-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 6px 10px;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    min-width: 40px;
+    flex-shrink: 0;
   }
   
   .mobile-room-selector {
@@ -647,31 +651,39 @@
   }
   
   .chat-header {
-    padding: 0 12px;
+    padding: 0 10px;
     height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
   .header-left {
-    gap: 8px;
+    gap: 6px;
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
   }
   
   .header-left h2 {
-    font-size: 1rem;
+    font-size: 0.95rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
   }
   
   .header-right {
-    gap: 10px;
+    gap: 6px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
   }
   
   .status {
-    font-size: 0.7rem;
-    padding: 4px 8px;
-    white-space: nowrap;
+    display: none; /* Ocultar en móvil para dar espacio */
   }
   
   .status::before {
