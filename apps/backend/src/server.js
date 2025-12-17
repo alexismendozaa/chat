@@ -30,6 +30,11 @@ app.use(morgan("dev"));
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
+// Also expose the dashboard behind nginx via /api/dashboard
+app.get(["/api/dashboard", "/api/dashboard/"], (req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/uploads", uploadRoutes);
