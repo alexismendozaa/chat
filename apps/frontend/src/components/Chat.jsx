@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
+import { uploadImage } from '../lib/upload.js';
 import './Chat.css';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || '';
@@ -10,6 +11,7 @@ export default function Chat({ token, username, onLogout }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [connected, setConnected] = useState(false);
+  const [file, setFile] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -108,6 +110,18 @@ export default function Chat({ token, username, onLogout }) {
     setInputText('');
   };
 
+  const sendImage = async () => {
+    if (!file || !token || !socket) return;
+    try {
+      const imageUrl = await uploadImage(file, token);
+      socket.emit('message', { roomId, imageUrl });
+      setFile(null);
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Error al subir la imagen');
+    }
+  };
+
   const changeRoom = (newRoom) => {
     setRoomId(newRoom);
     setMessages([]);
@@ -131,7 +145,7 @@ export default function Chat({ token, username, onLogout }) {
       <div className="chat-sidebar">
         <h3>Salas</h3>
         <div className="room-list">
-          {['general', 'random', 'tech', 'gaming'].map((room) => (
+          {['general', 'memes'].map((room) => (
             <button
               key={room}
               className={`room-btn ${roomId === room ? 'active' : ''}`}
@@ -181,6 +195,26 @@ export default function Chat({ token, username, onLogout }) {
           <button type="submit" className="send-btn" disabled={!connected || !inputText.trim()}>
             Enviar
           </button>
+          <label htmlFor="file-upload" className="file-label" title="Seleccionar imagen">
+            📎
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              style={{ display: 'none' }}
+            />
+          </label>
+          {file && (
+            <button
+              type="button"
+              onClick={sendImage}
+              className="send-image-btn"
+              disabled={!connected}
+            >
+              📤 {file.name.substring(0, 10)}...
+            </button>
+          )}
         </form>
       </div>
     </div>
