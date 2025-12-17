@@ -13,6 +13,8 @@ export default function Chat({ token, username, onLogout }) {
   const [connected, setConnected] = useState(false);
   const [file, setFile] = useState(null);
   const [showRoomSelector, setShowRoomSelector] = useState(false);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [viewType, setViewType] = useState('channels'); // 'channels' or 'dms'
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -85,14 +87,20 @@ export default function Chat({ token, username, onLogout }) {
       });
       if (response.ok) {
         const data = await response.json();
-        setMessages(data.map(msg => ({
+        const mappedMessages = data.map(msg => ({
           id: msg._id,
           roomId: msg.roomId,
           user: msg.username,
           text: msg.text,
           imageUrl: msg.imageUrl,
           createdAt: msg.createdAt,
-        })));
+        }));
+        setMessages(mappedMessages);
+        
+        // Extraer usuarios únicos de todos los mensajes (excluyendo el usuario actual)
+        const uniqueUsers = [...new Set(data.map(msg => msg.username))]
+          .filter(user => user !== username);
+        setActiveUsers(uniqueUsers);
       }
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -127,7 +135,21 @@ export default function Chat({ token, username, onLogout }) {
     setRoomId(newRoom);
     setMessages([]);
     setShowRoomSelector(false);
+    setViewType('channels');
   };
+
+  const openDirectMessage = (targetUser) => {
+    // Crear ID de sala DM ordenado alfabéticamente para consistencia
+    const users = [username, targetUser].sort();
+    const dmRoomId = `dm-${users[0]}-${users[1]}`;
+    setRoomId(dmRoomId);
+    setMessages([]);
+    setShowRoomSelector(false);
+    setViewType('dms');
+  };
+
+  const isDM = roomId.startsWith('dm-');
+  const dmUsername = isDM ? roomId.replace('dm-', '').split('-').find(u => u !== username) : null;
 
   return (
     <div className="chat-container">
@@ -136,7 +158,7 @@ export default function Chat({ token, username, onLogout }) {
           <button className="mobile-menu-btn" onClick={() => setShowRoomSelector(!showRoomSelector)}>
             ☰
           </button>
-          <h2>#{roomId}</h2>
+          <h2>{isDM ? `@${dmUsername}` : `#${roomId}`}</h2>
           <span className={`status ${connected ? 'connected' : 'disconnected'}`}>
             {connected ? 'Conectado' : 'Desconectado'}
           </span>
@@ -148,17 +170,41 @@ export default function Chat({ token, username, onLogout }) {
       </div>
 
       <div className="chat-sidebar">
-        <h3>Salas</h3>
-        <div className="room-list">
-          {['general', 'memes'].map((room) => (
-            <button
-              key={room}
-              className={`room-btn ${roomId === room ? 'active' : ''}`}
-              onClick={() => changeRoom(room)}
-            >
-              #{room}
-            </button>
-          ))}
+        <div className="sidebar-section">
+          <h3>Canales</h3>
+          <div className="room-list">
+            {['general', 'memes'].map((room) => (
+              <button
+                key={room}
+                className={`room-btn ${roomId === room ? 'active' : ''}`}
+                onClick={() => changeRoom(room)}
+              >
+                #{room}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="sidebar-section">
+          <h3>Mensajes Directos</h3>
+          <div className="room-list">
+            {activeUsers.length === 0 ? (
+              <p className="no-users">No hay usuarios activos</p>
+            ) : (
+              activeUsers.map((user) => {
+                const dmId = `dm-${[username, user].sort().join('-')}`;
+                return (
+                  <button
+                    key={user}
+                    className={`room-btn dm-btn ${roomId === dmId ? 'active' : ''}`}
+                    onClick={() => openDirectMessage(user)}
+                  >
+                    @{user}
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
 
@@ -166,16 +212,38 @@ export default function Chat({ token, username, onLogout }) {
       {showRoomSelector && (
         <div className="mobile-room-selector" onClick={() => setShowRoomSelector(false)}>
           <div className="mobile-room-list" onClick={(e) => e.stopPropagation()}>
-            <h3>Selecciona una sala</h3>
-            {['general', 'memes'].map((room) => (
-              <button
-                key={room}
-                className={`mobile-room-btn ${roomId === room ? 'active' : ''}`}
-                onClick={() => changeRoom(room)}
-              >
-                #{room}
-              </button>
-            ))}
+            <div className="mobile-section">
+              <h3>Canales</h3>
+              {['general', 'memes'].map((room) => (
+                <button
+                  key={room}
+                  className={`mobile-room-btn ${roomId === room ? 'active' : ''}`}
+                  onClick={() => changeRoom(room)}
+                >
+                  #{room}
+                </button>
+              ))}
+            </div>
+            
+            <div className="mobile-section">
+              <h3>Mensajes Directos</h3>
+              {activeUsers.length === 0 ? (
+                <p className="no-users-mobile">No hay usuarios activos</p>
+              ) : (
+                activeUsers.map((user) => {
+                  const dmId = `dm-${[username, user].sort().join('-')}`;
+                  return (
+                    <button
+                      key={user}
+                      className={`mobile-room-btn ${roomId === dmId ? 'active' : ''}`}
+                      onClick={() => openDirectMessage(user)}
+                    >
+                      @{user}
+                    </button>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       )}
