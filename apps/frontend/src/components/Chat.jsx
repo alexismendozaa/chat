@@ -3,7 +3,22 @@ import { io } from 'socket.io-client';
 import { uploadImage } from '../lib/upload.js';
 import './Chat.css';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || '';
+/* global process */
+const API_URL = (() => {
+  if (typeof globalThis !== 'undefined' && globalThis.__APP_BACKEND_URL) {
+    return globalThis.__APP_BACKEND_URL;
+  }
+  if (typeof process !== 'undefined' && process?.env?.VITE_BACKEND_URL) {
+    return process.env.VITE_BACKEND_URL;
+  }
+  try {
+    return new Function(
+      'return (typeof import !== "undefined" && import.meta && import.meta.env && import.meta.env.VITE_BACKEND_URL) ? import.meta.env.VITE_BACKEND_URL : "";'
+    )();
+  } catch {
+    return '';
+  }
+})();
 
 export default function Chat({ token, username, onLogout }) {
   const socketRef = useRef(null);
