@@ -48,12 +48,12 @@ export default function Chat({ token, username, onLogout }) {
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Connected to Socket.IO');
+      console.log(' Connected to Socket.IO');
       setConnected(true);
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Disconnected from Socket.IO');
+      console.log(' Disconnected from Socket.IO');
       setConnected(false);
     });
 
