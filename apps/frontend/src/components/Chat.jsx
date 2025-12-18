@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { uploadImage } from '../lib/upload.js';
 import './Chat.css';
@@ -6,7 +6,7 @@ import './Chat.css';
 const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Chat({ token, username, onLogout }) {
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
   const [roomId, setRoomId] = useState('general');
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -14,7 +14,6 @@ export default function Chat({ token, username, onLogout }) {
   const [file, setFile] = useState(null);
   const [showRoomSelector, setShowRoomSelector] = useState(false);
   const [activeUsers, setActiveUsers] = useState([]);
-  const [viewType, setViewType] = useState('channels'); // 'channels' or 'dms'
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -59,33 +58,15 @@ export default function Chat({ token, username, onLogout }) {
       }
     });
 
-    setSocket(newSocket);
+    socketRef.current = newSocket;
 
     return () => {
       newSocket.close();
+      socketRef.current = null;
     };
-  }, [token]);
+  }, [token, username]);
 
-  // Unirse a una sala y cargar mensajes
-  useEffect(() => {
-    if (!socket || !roomId) return;
-
-    // Unirse a la sala
-    socket.emit('joinRoom', { roomId });
-
-    socket.on('joined', ({ roomId: joinedRoom }) => {
-      console.log('Joined room:', joinedRoom);
-    });
-
-    // Cargar mensajes previos
-    loadMessages(roomId);
-
-    return () => {
-      socket.off('joined');
-    };
-  }, [socket, roomId]);
-
-  const loadMessages = async (room) => {
+  const loadMessages = useCallback(async (room) => {
     try {
       const response = await fetch(`${API_URL}/api/chat/rooms/${room}/messages`, {
         headers: {
@@ -112,13 +93,33 @@ export default function Chat({ token, username, onLogout }) {
     } catch (error) {
       console.error('Error loading messages:', error);
     }
-  };
+  }, [token, username]);
+
+  // Unirse a una sala y cargar mensajes
+  useEffect(() => {
+    if (!socketRef.current || !roomId) return;
+
+    // Unirse a la sala
+    socketRef.current.emit('joinRoom', { roomId });
+
+    const handleJoined = ({ roomId: joinedRoom }) => {
+      console.log('Joined room:', joinedRoom);
+      // Cargar mensajes previos después de confirmación del servidor
+      loadMessages(joinedRoom);
+    };
+
+    socketRef.current.on('joined', handleJoined);
+
+    return () => {
+      socketRef.current?.off('joined', handleJoined);
+    };
+  }, [roomId, loadMessages]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (!socket || !inputText.trim()) return;
+    if (!socketRef.current || !inputText.trim()) return;
 
-    socket.emit('message', {
+    socketRef.current.emit('message', {
       roomId,
       text: inputText.trim(),
     });
@@ -127,10 +128,10 @@ export default function Chat({ token, username, onLogout }) {
   };
 
   const sendImage = async () => {
-    if (!file || !token || !socket) return;
+    if (!file || !token || !socketRef.current) return;
     try {
       const imageUrl = await uploadImage(file, token);
-      socket.emit('message', { roomId, imageUrl });
+      socketRef.current.emit('message', { roomId, imageUrl });
       setFile(null);
     } catch (err) {
       console.error('Error uploading image:', err);
@@ -142,7 +143,6 @@ export default function Chat({ token, username, onLogout }) {
     setRoomId(newRoom);
     setMessages([]);
     setShowRoomSelector(false);
-    setViewType('channels');
   };
 
   const openDirectMessage = (targetUser) => {
@@ -152,7 +152,6 @@ export default function Chat({ token, username, onLogout }) {
     setRoomId(dmRoomId);
     setMessages([]);
     setShowRoomSelector(false);
-    setViewType('dms');
   };
 
   const isDM = roomId.startsWith('dm-');

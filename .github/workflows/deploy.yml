@@ -27,6 +27,11 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-frontend:latest apps/frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-frontend:latest
 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Deploy to EC2 (NO MANUAL STEPS)
         uses: appleboy/ssh-action@v1
         with:

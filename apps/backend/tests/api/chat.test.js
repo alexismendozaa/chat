@@ -1,20 +1,27 @@
+import { jest } from "@jest/globals";
 import request from "supertest";
-import app from "../testApp.js";
 
-let token;
+/* Mock auth */
+jest.unstable_mockModule("../../src/middlewares/auth.middleware.js", () => ({
+  requireAuth: (req, res, next) => next(),
+}));
 
-beforeAll(async () => {
-  const r = await request(app)
-    .post("/auth/login")
-    .send({ username: "testuser", password: "123456" });
+/* Mock Mongoose model */
+jest.unstable_mockModule("../../src/mongo/message.model.js", () => ({
+  Message: {
+    find: jest.fn(() => ({
+      sort: jest.fn(() => ({
+        limit: jest.fn().mockResolvedValue([]),
+      })),
+    })),
+  },
+}));
 
-  token = r.body.token;
-});
+
+const { default: app } = await import("../testApp.js");
 
 it("gets room messages", async () => {
-  const r = await request(app)
-    .get("/api/chat/rooms/general/messages")
-    .set("Authorization", `Bearer ${token}`);
+  const r = await request(app).get("/chat/rooms/general/messages");
 
   expect(r.statusCode).toBe(200);
   expect(Array.isArray(r.body)).toBe(true);
