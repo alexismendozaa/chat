@@ -11,6 +11,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd apps/backend && npm ci
+          cd ../frontend && npm ci
+
+      - name: Run tests and generate coverage
+        run: |
+          cd apps/backend && npm test
+          cd ../frontend && npm test
+
       - name: Login DockerHub
         uses: docker/login-action@v3
         with:
