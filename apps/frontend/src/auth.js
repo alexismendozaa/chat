@@ -1,4 +1,14 @@
-const API_URL = import.meta.env.VITE_BACKEND_URL || "";
+/* global process */
+const API_URL = (() => {
+  try {
+    return (import.meta?.env?.VITE_BACKEND_URL) || "";
+  } catch {
+    if (typeof process !== 'undefined' && process?.env?.VITE_BACKEND_URL) {
+      return process.env.VITE_BACKEND_URL;
+    }
+    return "";
+  }
+})();
 
 export async function login(username, password) {
   const r = await fetch(`${API_URL}/api/auth/login`, {

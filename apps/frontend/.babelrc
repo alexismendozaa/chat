@@ -6,5 +6,5 @@
     }],
     ["@babel/preset-react", { "runtime": "automatic" }]
   ],
-  "plugins": []
+  "plugins": ["@babel/plugin-syntax-import-meta"]
 }
