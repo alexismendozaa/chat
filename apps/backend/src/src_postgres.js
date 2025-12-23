@@ -6,7 +6,7 @@ export const pool = new pg.Pool({
 });
 
 export async function connectPostgres() {
-  if (!process.env.DATABASE_URL) throw new Error("❌ Missing DATABASE_URL");
+  if (!process.env.DATABASE_URL) throw new Error("Missing DATABASE_URL");
   const client = await pool.connect();
   try {
     const r = await client.query("SELECT now() as now");
